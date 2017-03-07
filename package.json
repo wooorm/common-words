@@ -1,0 +1,34 @@
+{
+  "name": "www-common-words",
+  "private": true,
+  "dependencies": {
+    "debounce": "^1.0.0",
+    "global": "^4.3.1",
+    "nlcst-normalize": "^2.1.0",
+    "retext-english": "^3.0.0",
+    "unified": "^6.0.0",
+    "virtual-dom": "^2.1.1",
+    "xtend": "^4.0.1"
+  },
+  "devDependencies": {
+    "brfs": "^1.4.3",
+    "browserify": "^14.0.0",
+    "bundle-collapser": "^1.2.1",
+    "esmangle": "^1.0.1",
+    "subtlex-word-frequencies": "^1.0.0",
+    "xo": "^0.17.1"
+  },
+  "scripts": {
+    "generate": "node generate",
+    "bundle": "browserify -t brfs -p bundle-collapser/plugin index.js | esmangle > build.js",
+    "build": "npm run generate && npm run bundle",
+    "lint": "xo",
+    "test": "npm run build && npm run lint"
+  },
+  "xo": {
+    "space": true,
+    "ignore": [
+      "build.js"
+    ]
+  }
+}
