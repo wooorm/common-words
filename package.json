@@ -7,6 +7,7 @@
     "nlcst-normalize": "^2.1.0",
     "retext-english": "^3.0.0",
     "unified": "^6.0.0",
+    "unist-util-visit": "^1.1.1",
     "virtual-dom": "^2.1.1",
     "xtend": "^4.0.1"
   },

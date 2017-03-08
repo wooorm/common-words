@@ -7,6 +7,7 @@ var patch = require('virtual-dom/patch');
 var h = require('virtual-dom/h');
 var unified = require('unified');
 var english = require('retext-english');
+var visit = require('unist-util-visit');
 var normalize = require('nlcst-normalize');
 var debounce = require('debounce');
 var xtend = require('xtend');
@@ -17,38 +18,70 @@ var offset = 7;
 var min = 3;
 var processor = unified().use(english);
 var root = doc.getElementById('root');
-var tree = render(doc.getElementsByTagName('template')[0].innerHTML);
+var info = doc.getElementsByTagName('aside')[0];
+var defaultValue = doc.getElementsByTagName('template')[0].innerHTML;
+var graph = createElement(list());
+
+info.appendChild(graph);
+
+var state = {
+  value: defaultValue,
+  normalize: false
+};
+
+var tree = render(state);
 var dom = root.appendChild(createElement(tree));
 
-doc.getElementsByTagName('aside')[0].appendChild(createElement(list()));
+function onchangevalue(ev) {
+  state.value = ev.target.value;
+  onchange();
+}
 
-function onchange(ev) {
-  var next = render(ev.target.value);
+function onchangenormalize(ev) {
+  state.normalize = ev.target.checked;
+  graph.style.opacity = Number(!state.normalize);
+  onchange();
+}
+
+function onchange() {
+  var next = render(state);
   dom = patch(dom, diff(tree, next));
   tree = next;
 }
 
 function resize() {
-  dom.lastChild.rows = rows(dom.firstChild);
+  dom.querySelector('textarea').rows = rows(dom.querySelector('.draw'));
 }
 
-function render(text) {
-  var tree = processor.runSync(processor.parse(text));
-  var change = debounce(onchange, 4);
+function render(state) {
+  var tree = processor.runSync(processor.parse(state.value));
+  var change = debounce(onchangevalue, 4);
   var key = 0;
 
   setTimeout(resize, 4);
 
-  return h('div', {key: 'editor', className: 'editor'}, [
-    h('div', {key: 'draw', className: 'draw'}, pad(all(tree, []))),
-    h('textarea', {
-      key: 'area',
-      value: text,
-      oninput: change,
-      onpaste: change,
-      onkeyup: change,
-      onmouseup: change
-    })
+  return h('div', [
+    h('div', {key: 'options', className: 'options'}, [
+      h('label', [
+        h('input', {
+          type: 'checkbox',
+          check: state.normalize,
+          onchange: onchangenormalize
+        }),
+        ' Average per sentence'
+      ])
+    ]),
+    h('div', {key: 'editor', className: 'editor'}, [
+      h('div', {key: 'draw', className: 'draw'}, pad(all(tree, []))),
+      h('textarea', {
+        key: 'area',
+        value: state.value,
+        oninput: change,
+        onpaste: change,
+        onkeyup: change,
+        onmouseup: change
+      })
+    ])
   ]);
 
   function all(node, parentIds) {
@@ -77,6 +110,22 @@ function render(text) {
     return result;
   }
 
+  function attributes(node) {
+    var scale;
+
+    if (state.normalize && node.type === 'SentenceNode') {
+      scale = calcIn(node);
+    }
+
+    if (!state.normalize && node.type === 'WordNode') {
+      scale = calc(node);
+    }
+
+    if (scale) {
+      return {style: {backgroundColor: color(scale)}};
+    }
+  }
+
   /* Trailing white-space in a `textarea` is shown, but not in a `div`
    * with `white-space: pre-wrap`. Add a `br` to make the last newline
    * explicit. */
@@ -91,18 +140,19 @@ function render(text) {
   }
 }
 
-function attributes(node) {
-  var value;
-  var scale;
+function calc(node) {
+  var value = normalize(node, {allowApostrophes: true}).toLowerCase();
+  return cap(Math.floor(Math.log(words.indexOf(value)) / Math.log(2)) - offset);
+}
 
-  if (node.type === 'WordNode') {
-    value = normalize(node, {allowApostrophes: true}).toLowerCase();
-    scale = cap(Math.floor(Math.log(words.indexOf(value)) / Math.log(2)) - offset);
-
-    if (scale) {
-      return {style: {backgroundColor: color(scale)}};
-    }
-  }
+function calcIn(node) {
+  var total = 0;
+  var count = 0;
+  visit(node, 'WordNode', function (child) {
+    total += calc(child);
+    count++;
+  });
+  return total / count;
 }
 
 function list() {

@@ -95,10 +95,24 @@ textarea {
   padding-left: 0;
   list-style-type: none;
   color: white;
+  transition: opacity 200ms;
 }
 
 .colors li {
   text-align: center;
+}
+
+.options {
+  max-width: 37em;
+  margin: auto;
+  margin-bottom: 1em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid hsl(300, 95%, 43%);
+}
+
+[type=checkbox] {
+  margin: 0 0.5em 0.25em 0;
+  vertical-align: middle;
 }
 
 @media (min-width: 75em) { /* (37 * 2) + 1 */
