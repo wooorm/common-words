@@ -1,8 +1,11 @@
-html {
+html, select, button {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 16px;
   line-height: 1.5;
   color: hsl(300, 95%, 4%);
+}
+
+html {
   background-color: hsl(300, 95%, 98%);
 }
 
@@ -115,11 +118,25 @@ textarea {
   vertical-align: middle;
 }
 
+select {
+  margin: 0;
+}
+
+label {
+  display: block;
+}
+
 @media (min-width: 75em) { /* (37 * 2) + 1 */
   aside {
     max-width: 21.1428571429em; /* 37 * (16 / 14) * 1/2 */
     position: absolute;
     top: 4.5714285714em; /* 4 * (16 / 14) */
     right: 1.1428571429em; /* 16 / 14 */
+  }
+}
+
+@media (min-width: 37em) {
+  label {
+    float: right;
   }
 }

@@ -19,13 +19,14 @@ var min = 3;
 var processor = unified().use(english);
 var root = doc.getElementById('root');
 var info = doc.getElementsByTagName('aside')[0];
-var defaultValue = doc.getElementsByTagName('template')[0].innerHTML;
+var templates = [].slice.call(doc.getElementsByTagName('template'));
 var graph = createElement(list());
 
 info.appendChild(graph);
 
 var state = {
-  value: defaultValue,
+  template: optionForTemplate(templates[0]),
+  value: valueForTemplate(templates[0]),
   normalize: false
 };
 
@@ -33,13 +34,27 @@ var tree = render(state);
 var dom = root.appendChild(createElement(tree));
 
 function onchangevalue(ev) {
-  state.value = ev.target.value;
-  onchange();
+  var prev = state.value;
+  var next = ev.target.value;
+
+  if (prev !== next) {
+    state.value = ev.target.value;
+    state.template = null;
+    onchange();
+  }
 }
 
 function onchangenormalize(ev) {
   state.normalize = ev.target.checked;
   graph.style.opacity = Number(!state.normalize);
+  onchange();
+}
+
+function onchangetemplate(ev) {
+  var target = ev.target.selectedOptions[0];
+  var node = doc.querySelector('[data-label="' + target.textContent + '"]');
+  state.template = optionForTemplate(node);
+  state.value = valueForTemplate(node);
   onchange();
 }
 
@@ -57,19 +72,32 @@ function render(state) {
   var tree = processor.runSync(processor.parse(state.value));
   var change = debounce(onchangevalue, 4);
   var key = 0;
+  var unselected = true;
+  var options = templates.map(function (template, index) {
+    var selected = optionForTemplate(template) === state.template;
+
+    if (selected) {
+      unselected = false;
+    }
+
+    return h('option', {key: index, selected: selected}, optionForTemplate(template));
+  });
 
   setTimeout(resize, 4);
 
   return h('div', [
     h('div', {key: 'options', className: 'options'}, [
-      h('label', [
+      h('label', {key: 'label'}, [
         h('input', {
           type: 'checkbox',
           check: state.normalize,
           onchange: onchangenormalize
         }),
         ' Average per sentence'
-      ])
+      ]),
+      h('select', {key: 'select', onchange: onchangetemplate}, [
+        unselected ? h('option', {key: '-1', selected: unselected}, '--') : null
+      ].concat(options))
     ]),
     h('div', {key: 'editor', className: 'editor'}, [
       h('div', {key: 'draw', className: 'draw'}, pad(all(tree, []))),
@@ -213,4 +241,12 @@ function rows(node) {
     node.getBoundingClientRect().height /
     parseInt(win.getComputedStyle(node).lineHeight, 10)
   );
+}
+
+function optionForTemplate(template) {
+  return template.dataset.label;
+}
+
+function valueForTemplate(template) {
+  return template.innerHTML + '\n\n— ' + optionForTemplate(template);
 }
