@@ -6,6 +6,7 @@
 
 *   [write-music](http://github.com/wooorm/write-music)
 *   [short-words](http://github.com/wooorm/short-words)
+*   [readability](http://github.com/wooorm/readability)
 
 ## Data
 
