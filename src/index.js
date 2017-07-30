@@ -11,27 +11,33 @@ var visit = require('unist-util-visit');
 var normalize = require('nlcst-normalize');
 var debounce = require('debounce');
 var xtend = require('xtend');
+var mean = require('compute-mean');
+var median = require('compute-median');
+var mode = require('compute-mode');
 
-var words = fs.readFileSync('words.txt', 'utf8').split(',');
+var words = fs.readFileSync('src/words.txt', 'utf8').split(',');
 
 var offset = 7;
 var min = 3;
 var processor = unified().use(english);
-var root = doc.getElementById('root');
-var info = doc.getElementsByTagName('aside')[0];
+var main = doc.getElementsByTagName('main')[0];
 var templates = [].slice.call(doc.getElementsByTagName('template'));
-var graph = createElement(list());
 
-info.appendChild(graph);
+var averages = {
+  mean: mean,
+  median: median,
+  mode: modeMean
+};
 
 var state = {
   template: optionForTemplate(templates[0]),
   value: valueForTemplate(templates[0]),
+  average: 'mean',
   normalize: false
 };
 
 var tree = render(state);
-var dom = root.appendChild(createElement(tree));
+var dom = main.appendChild(createElement(tree));
 
 function onchangevalue(ev) {
   var prev = state.value;
@@ -46,7 +52,6 @@ function onchangevalue(ev) {
 
 function onchangenormalize(ev) {
   state.normalize = ev.target.checked;
-  graph.style.opacity = Number(!state.normalize);
   onchange();
 }
 
@@ -55,6 +60,11 @@ function onchangetemplate(ev) {
   var node = doc.querySelector('[data-label="' + target.textContent + '"]');
   state.template = optionForTemplate(node);
   state.value = valueForTemplate(node);
+  onchange();
+}
+
+function onchangeaverage(ev) {
+  state.average = ev.target.value.toLowerCase();
   onchange();
 }
 
@@ -86,18 +96,8 @@ function render(state) {
   setTimeout(resize, 4);
 
   return h('div', [
-    h('div', {key: 'options', className: 'options'}, [
-      h('label', {key: 'label'}, [
-        h('input', {
-          type: 'checkbox',
-          check: state.normalize,
-          onchange: onchangenormalize
-        }),
-        ' Average per sentence'
-      ]),
-      h('select', {key: 'select', onchange: onchangetemplate}, [
-        unselected ? h('option', {key: '-1', selected: unselected}, '--') : null
-      ].concat(options))
+    h('section.highlight', [
+      h('h1', {key: 'title'}, 'common words')
     ]),
     h('div', {key: 'editor', className: 'editor'}, [
       h('div', {key: 'draw', className: 'draw'}, pad(all(tree, []))),
@@ -109,6 +109,59 @@ function render(state) {
         onkeyup: change,
         onmouseup: change
       })
+    ]),
+    state.normalize ? null : h('section', list()),
+    h('section.highlight', [
+      h('p', {key: 'byline'}, [
+        'Use common words. Common words are more powerful and less pretentious. ',
+        h('em', 'Stop'),
+        ' is stronger than ',
+        h('em', 'discontinue'),
+        '.'
+      ]),
+      h('p', {key: 'intro'}, [
+        'The demo highlights words by how rare they are in English, ',
+        'exponentially. If they are “redacted”, chances are your readers ',
+        'don’t understand them either.'
+      ]),
+      h('p', {key: 'ps'}, [
+        'You can edit the text above, or ',
+        h('label', [
+          'pick a template: ',
+          h('select', {key: 'template', onchange: onchangetemplate}, [
+            unselected ? h('option', {key: '-1', selected: unselected}, '--') : null
+          ].concat(options))
+        ])
+      ]),
+      h('p', {key: 4}, [
+        h('label', ['Average '].concat(
+          state.normalize ? [
+            '(',
+            h('select', {key: 'average', onchange: onchangeaverage}, [
+              h('option', {key: 0, selected: state.average === 'mean'}, 'mean'),
+              h('option', {key: 1, selected: state.average === 'median'}, 'median'),
+              h('option', {key: 2, selected: state.average === 'mode'}, 'mode')
+            ]),
+            ')'
+          ] : []
+        ).concat([
+          ' per sentence: ',
+          h('input', {
+            type: 'checkbox',
+            checked: state.normalize,
+            onchange: onchangenormalize
+          })
+        ]))
+      ])
+    ]),
+    h('section.credits', {key: 'credits'}, [
+      h('p', [
+        h('a', {href: 'https://github.com/wooorm/common-words'}, 'GitHub'),
+        ' • ',
+        h('a', {href: 'https://github.com/wooorm/commonswords/blob/src/LICENSE'}, 'MIT'),
+        ' • ',
+        h('a', {href: 'http://wooorm.com'}, '@wooorm')
+      ])
     ])
   ]);
 
@@ -174,13 +227,12 @@ function calc(node) {
 }
 
 function calcIn(node) {
-  var total = 0;
-  var count = 0;
+  var values = [];
   visit(node, 'WordNode', function (child) {
-    total += calc(child);
-    count++;
+    values.push(calc(child));
   });
-  return total / count;
+  console.log('v: ', values, averages[state.average](values));
+  return averages[state.average](values);
 }
 
 function list() {
@@ -221,7 +273,7 @@ function list() {
 }
 
 function color(scale) {
-  return 'rgba(0,0,0,' + scale + ')';
+  return 'rgba(0, 0, 0, ' + scale + ')';
 }
 
 function cap(scale) {
@@ -249,4 +301,8 @@ function optionForTemplate(template) {
 
 function valueForTemplate(template) {
   return template.innerHTML + '\n\n— ' + optionForTemplate(template);
+}
+
+function modeMean(value) {
+  return mean(mode(value));
 }

@@ -1,4 +1,5 @@
 .DS_Store
 *.log
 node_modules/
-words.txt
+src/words.txt
+dest/
