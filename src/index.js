@@ -187,7 +187,7 @@ function render(state) {
         ' • ',
         h(
           'a',
-          {href: 'https://github.com/wooorm/commonswords/blob/src/LICENSE'},
+          {href: 'https://github.com/wooorm/common-words/blob/src/LICENSE'},
           'MIT'
         ),
         ' • ',
