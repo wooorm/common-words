@@ -1,4 +1,4 @@
-## common-words
+# common-words
 
 [![screenshot](screenshot.png)](http://wooorm.com/common-words)
 

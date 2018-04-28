@@ -1,6 +1,13 @@
 {
   "name": "www-common-words",
   "private": true,
+  "license": "MIT",
+  "repository": "wooorm/common-words",
+  "bugs": "https://github.com/wooorm/common-words/issues",
+  "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
+  "contributors": [
+    "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)"
+  ],
   "dependencies": {},
   "devDependencies": {
     "brfs": "^1.4.0",
@@ -15,9 +22,12 @@
     "global": "^4.0.0",
     "nlcst-normalize": "^2.1.0",
     "postcss-cli": "^5.0.0",
+    "prettier": "^1.12.1",
     "rehype-cli": "^5.0.0",
     "rehype-preset-minify": "^2.0.0",
     "rehype-prevent-favicon-request": "^1.0.0",
+    "remark-cli": "^5.0.0",
+    "remark-preset-wooorm": "^4.0.0",
     "retext-english": "^3.0.0",
     "stylelint": "^9.2.0",
     "stylelint-config-standard": "^18.2.0",
@@ -29,19 +39,27 @@
     "xtend": "^4.0.0"
   },
   "scripts": {
-    "build:generate": "node build",
+    "generate": "node build",
+    "format": "remark . -qfo && prettier --write '**/*.js' && xo --fix && stylelint src/index.css --fix",
     "build:js": "browserify -t brfs -p bundle-collapser/plugin src/index.js | esmangle > dest/index.js",
     "build:css": "postcss src/index.css > dest/index.css",
     "build:html": "rehype -u preset-minify -u prevent-favicon-request src -o dest",
-    "build": "npm run build:generate && npm run build:js && npm run build:css && npm run build:html",
-    "lint": "xo && stylelint src/index.css",
-    "test": "npm run lint && npm run build"
+    "build": "npm run build:js && npm run build:css && npm run build:html",
+    "test": "npm run generate && npm run format && npm run build"
   },
   "stylelint": {
     "extends": "stylelint-config-standard"
   },
+  "prettier": {
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "bracketSpacing": false,
+    "semi": false,
+    "trailingComma": "none"
+  },
   "xo": {
-    "space": true,
+    "prettier": true,
     "esnext": false,
     "rules": {
       "no-var": "off",
@@ -55,5 +73,10 @@
         "preset": "default"
       }
     }
+  },
+  "remarkConfig": {
+    "plugins": [
+      "preset-wooorm"
+    ]
   }
 }
