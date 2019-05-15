@@ -20,8 +20,8 @@ var words = fs.readFileSync('src/words.txt', 'utf8').split(',')
 var offset = 7
 var min = 3
 var processor = unified().use(english)
-var main = doc.getElementsByTagName('main')[0]
-var templates = [].slice.call(doc.getElementsByTagName('template'))
+var main = doc.querySelectorAll('main')[0]
+var templates = [].slice.call(doc.querySelectorAll('template'))
 
 var averages = {
   mean: mean,
