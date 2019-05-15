@@ -12,7 +12,6 @@
   "devDependencies": {
     "brfs": "^2.0.0",
     "browserify": "^16.0.0",
-    "bundle-collapser": "^1.2.0",
     "compute-mean": "^3.0.0",
     "compute-median": "^2.0.0",
     "compute-mode": "^1.0.0",
@@ -32,6 +31,7 @@
     "stylelint": "^10.0.0",
     "stylelint-config-standard": "^18.2.0",
     "subtlex-word-frequencies": "^1.0.0",
+    "tinyify": "^2.5.0",
     "unified": "^7.0.0",
     "unist-util-visit": "^1.1.0",
     "virtual-dom": "^2.1.0",
@@ -41,7 +41,7 @@
   "scripts": {
     "generate": "node build",
     "format": "remark . -qfo && prettier --write \"**/*.js\" && xo --fix && stylelint src/index.css --fix",
-    "build:js": "browserify -t brfs -p bundle-collapser/plugin src/index.js | esmangle > dest/index.js",
+    "build:js": "browserify src -t brfs -p tinyify -o dest/index.js",
     "build:css": "postcss src/index.css > dest/index.css",
     "build:html": "rehype -u preset-minify -u prevent-favicon-request src -o dest",
     "build": "npm run build:js && npm run build:css && npm run build:html",
