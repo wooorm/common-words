@@ -191,7 +191,7 @@ function render(state) {
           'MIT'
         ),
         ' • ',
-        h('a', {href: 'http://wooorm.com'}, '@wooorm')
+        h('a', {href: 'https://wooorm.com'}, '@wooorm')
       ])
     ])
   ])

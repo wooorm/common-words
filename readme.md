@@ -1,12 +1,12 @@
 # common-words
 
-[![screenshot](screenshot.png)](http://wooorm.com/common-words)
+[![screenshot](screenshot.png)](https://wooorm.com/common-words)
 
 ## Related
 
-*   [write-music](http://github.com/wooorm/write-music)
-*   [short-words](http://github.com/wooorm/short-words)
-*   [readability](http://github.com/wooorm/readability)
+*   [write-music](https://github.com/wooorm/write-music)
+*   [short-words](https://github.com/wooorm/short-words)
+*   [readability](https://github.com/wooorm/readability)
 
 ## Data
 
