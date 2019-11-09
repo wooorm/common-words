@@ -17,6 +17,8 @@ var mode = require('compute-mode')
 
 var words = fs.readFileSync('src/words.txt', 'utf8').split(',')
 
+var darkQuery = '(prefers-color-scheme: dark)'
+
 var offset = 7
 var min = 3
 var processor = unified().use(english)
@@ -38,6 +40,8 @@ var state = {
 
 var tree = render(state)
 var dom = main.appendChild(createElement(tree))
+
+win.matchMedia(darkQuery).addListener(onchange)
 
 function onchangevalue(ev) {
   var prev = state.value
@@ -79,6 +83,7 @@ function resize() {
 }
 
 function render(state) {
+  var dark = win.matchMedia(darkQuery).matches
   var tree = processor.runSync(processor.parse(state.value))
   var change = debounce(onchangevalue, 4)
   var key = 0
@@ -112,7 +117,7 @@ function render(state) {
         onmouseup: change
       })
     ]),
-    state.normalize ? null : h('section', list()),
+    state.normalize ? null : h('section', list(dark)),
     h('section.highlight', [
       h('p', {key: 'byline'}, [
         'Use common words. Common words are more powerful and less pretentious. ',
@@ -234,7 +239,7 @@ function render(state) {
     }
 
     if (scale) {
-      return {style: {backgroundColor: color(scale)}}
+      return {style: {backgroundColor: color(scale, dark)}}
     }
   }
 
@@ -265,7 +270,7 @@ function calcIn(node) {
   return averages[state.average](values)
 }
 
-function list() {
+function list(dark) {
   var index = offset + min - 1
   var nodes = []
   var prev = 0
@@ -290,8 +295,8 @@ function list() {
         'li',
         {
           style: {
-            backgroundColor: color(capped),
-            color: capped > 0.6 ? 'white' : 'black'
+            backgroundColor: color(capped, dark),
+            color: (dark ? capped < 0.6 : capped > 0.6) ? 'white' : 'black'
           }
         },
         message
@@ -308,8 +313,10 @@ function list() {
   return h('ol.colors', nodes)
 }
 
-function color(scale) {
-  return 'rgba(0, 0, 0, ' + scale + ')'
+function color(scale, dark) {
+  var x = dark ? 255 : 0
+  var rgb = [x, x, x].join(', ')
+  return 'rgba(' + rgb + ', ' + scale + ')'
 }
 
 function cap(scale) {
