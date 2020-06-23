@@ -10,7 +10,6 @@ var english = require('retext-english')
 var visit = require('unist-util-visit')
 var normalize = require('nlcst-normalize')
 var debounce = require('debounce')
-var xtend = require('xtend')
 var mean = require('compute-mean')
 var median = require('compute-median')
 var mode = require('compute-mode')
@@ -44,10 +43,10 @@ var dom = main.appendChild(createElement(tree))
 win.matchMedia(darkQuery).addListener(onchange)
 
 function onchangevalue(ev) {
-  var prev = state.value
+  var previous = state.value
   var next = ev.target.value
 
-  if (prev !== next) {
+  if (previous !== next) {
     state.value = ev.target.value
     state.template = null
     onchange()
@@ -88,7 +87,7 @@ function render(state) {
   var change = debounce(onchangevalue, 4)
   var key = 0
   var unselected = true
-  var options = templates.map(function(template, index) {
+  var options = templates.map(function (template, index) {
     var selected = optionForTemplate(template) === state.template
 
     if (selected) {
@@ -220,7 +219,7 @@ function render(state) {
     var id = parentIds.join('-') + '-' + key
 
     if (attrs) {
-      result = h('span', xtend({key: id, id: id}, attrs), result)
+      result = h('span', Object.assign({key: id, id: id}, attrs), result)
       key++
     }
 
@@ -258,13 +257,13 @@ function render(state) {
 }
 
 function calc(node) {
-  var value = normalize(node, {allowApostrophes: true}).toLowerCase()
+  var value = normalize(node)
   return cap(Math.floor(Math.log(words.indexOf(value)) / Math.log(2)) - offset)
 }
 
 function calcIn(node) {
   var values = []
-  visit(node, 'WordNode', function(child) {
+  visit(node, 'WordNode', function (child) {
     values.push(calc(child))
   })
   return averages[state.average](values)
@@ -273,21 +272,21 @@ function calcIn(node) {
 function list(dark) {
   var index = offset + min - 1
   var nodes = []
-  var prev = 0
-  var val
+  var previous = 0
+  var value
   var capped
   var message
 
   while (++index) {
-    val = Math.pow(2, index)
+    value = Math.pow(2, index)
     capped = cap(index - offset)
 
     if (capped === 1) {
-      message = prev + ' and less common'
-    } else if (prev) {
-      message = prev + ' to ' + val
+      message = previous + ' and less common'
+    } else if (previous) {
+      message = previous + ' to ' + value
     } else {
-      message = 'Top ' + val + ' words'
+      message = 'Top ' + value + ' words'
     }
 
     nodes.push(
@@ -303,11 +302,11 @@ function list(dark) {
       )
     )
 
-    if (val > words.length) {
+    if (value > words.length) {
       break
     }
 
-    prev = val
+    previous = value
   }
 
   return h('ol.colors', nodes)
