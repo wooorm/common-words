@@ -8,7 +8,6 @@
   "contributors": [
     "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)"
   ],
-  "dependencies": {},
   "devDependencies": {
     "brfs": "^2.0.0",
     "browserify": "^17.0.0",
@@ -24,17 +23,17 @@
     "rehype-cli": "^10.0.0",
     "rehype-preset-minify": "^5.0.0",
     "rehype-prevent-favicon-request": "^2.0.0",
-    "remark-cli": "^9.0.0-alpha.1",
+    "remark-cli": "^9.0.0",
     "remark-preset-wooorm": "^8.0.0",
     "retext-english": "^3.0.0",
     "stylelint": "^13.0.0",
-    "stylelint-config-standard": "^20.0.0",
+    "stylelint-config-standard": "^21.0.0",
     "subtlex-word-frequencies": "^2.0.0",
     "tinyify": "^3.0.0",
     "unified": "^9.0.0",
     "unist-util-visit": "^2.0.0",
     "virtual-dom": "^2.0.0",
-    "xo": "^0.33.0"
+    "xo": "^0.38.0"
   },
   "scripts": {
     "generate": "node build",
@@ -60,9 +59,8 @@
     "prettier": true,
     "esnext": false,
     "rules": {
-      "unicorn/no-fn-reference-in-iterator": "off",
-      "unicorn/prefer-exponentiation-operator": "off",
-      "unicorn/prefer-node-append": "off",
+      "unicorn/no-array-callback-reference": "off",
+      "unicorn/prefer-dom-node-append": "off",
       "unicorn/prefer-number-properties": "off",
       "prefer-exponentiation-operator": "off"
     }
