@@ -1,20 +1,18 @@
-var fs = require('fs')
-var doc = require('global/document')
-var win = require('global/window')
-var createElement = require('virtual-dom/create-element')
-var diff = require('virtual-dom/diff')
-var patch = require('virtual-dom/patch')
-var h = require('virtual-dom/h')
-var unified = require('unified')
-var english = require('retext-english')
-var visit = require('unist-util-visit')
-var normalize = require('nlcst-normalize')
-var debounce = require('debounce')
-var mean = require('compute-mean')
-var median = require('compute-median')
-var mode = require('compute-mode')
-
-var words = fs.readFileSync('src/words.txt', 'utf8').split(',')
+import doc from 'global/document.js'
+import win from 'global/window.js'
+import createElement from 'virtual-dom/create-element.js'
+import diff from 'virtual-dom/diff.js'
+import patch from 'virtual-dom/patch.js'
+import h from 'virtual-dom/h.js'
+import unified from 'unified'
+import english from 'retext-english'
+import visit from 'unist-util-visit'
+import normalize from 'nlcst-normalize'
+import debounce from 'debounce'
+import mean from 'compute-mean'
+import median from 'compute-median'
+import mode from 'compute-mode'
+import {words} from './words.js'
 
 var darkQuery = '(prefers-color-scheme: dark)'
 
@@ -25,8 +23,8 @@ var main = doc.querySelectorAll('main')[0]
 var templates = [].slice.call(doc.querySelectorAll('template'))
 
 var averages = {
-  mean: mean,
-  median: median,
+  mean,
+  median,
   mode: modeMean
 }
 
@@ -87,18 +85,14 @@ function render(state) {
   var change = debounce(onchangevalue, 4)
   var key = 0
   var unselected = true
-  var options = templates.map(function (template, index) {
+  var options = templates.map((template, index) => {
     var selected = optionForTemplate(template) === state.template
 
     if (selected) {
       unselected = false
     }
 
-    return h(
-      'option',
-      {key: index, selected: selected},
-      optionForTemplate(template)
-    )
+    return h('option', {key: index, selected}, optionForTemplate(template))
   })
 
   setTimeout(resize, 4)
@@ -219,7 +213,7 @@ function render(state) {
     var id = parentIds.join('-') + '-' + key
 
     if (attrs) {
-      result = h('span', Object.assign({key: id, id: id}, attrs), result)
+      result = h('span', Object.assign({key: id, id}, attrs), result)
       key++
     }
 
@@ -263,7 +257,7 @@ function calc(node) {
 
 function calcIn(node) {
   var values = []
-  visit(node, 'WordNode', function (child) {
+  visit(node, 'WordNode', (child) => {
     values.push(calc(child))
   })
   return averages[state.average](values)
@@ -278,7 +272,7 @@ function list(dark) {
   var message
 
   while (++index) {
-    value = Math.pow(2, index)
+    value = 2 ** index
     capped = cap(index - offset)
 
     if (capped === 1) {
@@ -319,7 +313,7 @@ function color(scale, dark) {
 }
 
 function cap(scale) {
-  if (scale > 10 || isNaN(scale)) {
+  if (scale > 10 || Number.isNaN(scale)) {
     scale = 10
   }
 
@@ -333,7 +327,7 @@ function rows(node) {
 
   return Math.ceil(
     node.getBoundingClientRect().height /
-      parseInt(win.getComputedStyle(node).lineHeight, 10)
+      Number.parseInt(win.getComputedStyle(node).lineHeight, 10)
   )
 }
 

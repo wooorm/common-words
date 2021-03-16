@@ -1,6 +1,6 @@
 .DS_Store
 *.log
 node_modules/
-src/words.txt
+src/words.js
 dest/
 yarn.lock

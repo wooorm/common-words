@@ -1,17 +1,28 @@
-'use strict'
+import fs from 'fs'
+import path from 'path'
 
-var fs = require('fs')
-var path = require('path')
-var frequencies = require('subtlex-word-frequencies')
+var frequencies = JSON.parse(
+  fs.readFileSync(
+    path.join(
+      process.cwd(),
+      'node_modules',
+      'subtlex-word-frequencies',
+      'index.json'
+    )
+  )
+)
 
-var data = frequencies.concat().sort(sort).slice(0, Math.pow(2, 16)).map(map)
+var data = frequencies
+  .concat()
+  .sort(sort)
+  .slice(0, 2 ** 16)
+  .map((value) => value.word.toLowerCase())
 
-fs.writeFileSync(path.join('src', 'words.txt'), String(data))
+fs.writeFileSync(
+  path.join('src', 'words.js'),
+  'export var words = ' + JSON.stringify(data) + '\n'
+)
 
 function sort(a, b) {
   return b.count - b.count
-}
-
-function map(value) {
-  return value.word.toLowerCase()
 }
