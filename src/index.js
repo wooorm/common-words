@@ -4,10 +4,10 @@ import createElement from 'virtual-dom/create-element.js'
 import diff from 'virtual-dom/diff.js'
 import patch from 'virtual-dom/patch.js'
 import h from 'virtual-dom/h.js'
-import unified from 'unified'
-import english from 'retext-english'
-import visit from 'unist-util-visit'
-import normalize from 'nlcst-normalize'
+import {unified} from 'unified'
+import retextEnglish from 'retext-english'
+import {visit} from 'unist-util-visit'
+import {normalize} from 'nlcst-normalize'
 import debounce from 'debounce'
 import mean from 'compute-mean'
 import median from 'compute-median'
@@ -18,9 +18,9 @@ var darkQuery = '(prefers-color-scheme: dark)'
 
 var offset = 7
 var min = 3
-var processor = unified().use(english)
+var processor = unified().use(retextEnglish)
 var main = doc.querySelectorAll('main')[0]
-var templates = [].slice.call(doc.querySelectorAll('template'))
+var templates = [...doc.querySelectorAll('template')]
 
 var averages = {
   mean,
