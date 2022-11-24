@@ -45,7 +45,7 @@
     "generate:css": "postcss src/index.css > dest/index.css",
     "generate:html": "rehype -u preset-minify -u prevent-favicon-request src -o dest",
     "generate": "npm run generate:data && npm run generate:js && npm run generate:css && npm run generate:html",
-    "test": "npm run build && npm run format && npm run generate"
+    "test": "npm run generate:data && npm run build && npm run format && npm run generate"
   },
   "stylelint": {
     "extends": "stylelint-config-standard"
