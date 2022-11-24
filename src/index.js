@@ -14,35 +14,35 @@ import median from 'compute-median'
 import mode from 'compute-mode'
 import {words} from './words.js'
 
-var darkQuery = '(prefers-color-scheme: dark)'
+const darkQuery = '(prefers-color-scheme: dark)'
 
-var offset = 7
-var min = 3
-var processor = unified().use(retextEnglish)
-var main = doc.querySelectorAll('main')[0]
-var templates = [...doc.querySelectorAll('template')]
+const offset = 7
+const min = 3
+const processor = unified().use(retextEnglish)
+const main = doc.querySelectorAll('main')[0]
+const templates = [...doc.querySelectorAll('template')]
 
-var averages = {
+const averages = {
   mean,
   median,
   mode: modeMean
 }
 
-var state = {
+const state = {
   template: optionForTemplate(templates[0]),
   value: valueForTemplate(templates[0]),
   average: 'mean',
   normalize: false
 }
 
-var tree = render(state)
-var dom = main.appendChild(createElement(tree))
+let tree = render(state)
+let dom = main.appendChild(createElement(tree))
 
 win.matchMedia(darkQuery).addListener(onchange)
 
 function onchangevalue(ev) {
-  var previous = state.value
-  var next = ev.target.value
+  const previous = state.value
+  const next = ev.target.value
 
   if (previous !== next) {
     state.value = ev.target.value
@@ -57,8 +57,8 @@ function onchangenormalize(ev) {
 }
 
 function onchangetemplate(ev) {
-  var target = ev.target.selectedOptions[0]
-  var node = doc.querySelector('[data-label="' + target.textContent + '"]')
+  const target = ev.target.selectedOptions[0]
+  const node = doc.querySelector('[data-label="' + target.textContent + '"]')
   state.template = optionForTemplate(node)
   state.value = valueForTemplate(node)
   onchange()
@@ -70,7 +70,7 @@ function onchangeaverage(ev) {
 }
 
 function onchange() {
-  var next = render(state)
+  const next = render(state)
   dom = patch(dom, diff(tree, next))
   tree = next
 }
@@ -80,13 +80,13 @@ function resize() {
 }
 
 function render(state) {
-  var dark = win.matchMedia(darkQuery).matches
-  var tree = processor.runSync(processor.parse(state.value))
-  var change = debounce(onchangevalue, 4)
-  var key = 0
-  var unselected = true
-  var options = templates.map((template, index) => {
-    var selected = optionForTemplate(template) === state.template
+  const dark = win.matchMedia(darkQuery).matches
+  const tree = processor.runSync(processor.parse(state.value))
+  const change = debounce(onchangevalue, 4)
+  let key = 0
+  let unselected = true
+  const options = templates.map((template, index) => {
+    const selected = optionForTemplate(template) === state.template
 
     if (selected) {
       unselected = false
@@ -195,10 +195,10 @@ function render(state) {
   ])
 
   function all(node, parentIds) {
-    var children = node.children
-    var length = children.length
-    var index = -1
-    var results = []
+    const children = node.children
+    const length = children.length
+    let index = -1
+    let results = []
 
     while (++index < length) {
       results = results.concat(one(children[index], parentIds.concat(index)))
@@ -208,9 +208,9 @@ function render(state) {
   }
 
   function one(node, parentIds) {
-    var result = 'value' in node ? node.value : all(node, parentIds)
-    var attrs = attributes(node)
-    var id = parentIds.join('-') + '-' + key
+    let result = 'value' in node ? node.value : all(node, parentIds)
+    const attrs = attributes(node)
+    const id = parentIds.join('-') + '-' + key
 
     if (attrs) {
       result = h('span', Object.assign({key: id, id}, attrs), result)
@@ -221,7 +221,7 @@ function render(state) {
   }
 
   function attributes(node) {
-    var scale
+    let scale
 
     if (state.normalize && node.type === 'SentenceNode') {
       scale = calcIn(node)
@@ -240,7 +240,7 @@ function render(state) {
   // `white-space: pre-wrap`.
   // Add a `br` to make the last newline explicit.
   function pad(nodes) {
-    var tail = nodes[nodes.length - 1]
+    const tail = nodes[nodes.length - 1]
 
     if (typeof tail === 'string' && tail.charAt(tail.length - 1) === '\n') {
       nodes.push(h('br', {key: 'break'}))
@@ -251,12 +251,12 @@ function render(state) {
 }
 
 function calc(node) {
-  var value = normalize(node)
+  const value = normalize(node)
   return cap(Math.floor(Math.log(words.indexOf(value)) / Math.log(2)) - offset)
 }
 
 function calcIn(node) {
-  var values = []
+  const values = []
   visit(node, 'WordNode', (child) => {
     values.push(calc(child))
   })
@@ -264,16 +264,14 @@ function calcIn(node) {
 }
 
 function list(dark) {
-  var index = offset + min - 1
-  var nodes = []
-  var previous = 0
-  var value
-  var capped
-  var message
+  let index = offset + min - 1
+  const nodes = []
+  let previous = 0
 
   while (++index) {
-    value = 2 ** index
-    capped = cap(index - offset)
+    const value = 2 ** index
+    const capped = cap(index - offset)
+    let message
 
     if (capped === 1) {
       message = previous + ' and less common'
@@ -307,8 +305,8 @@ function list(dark) {
 }
 
 function color(scale, dark) {
-  var x = dark ? 255 : 0
-  var rgb = [x, x, x].join(', ')
+  const x = dark ? 255 : 0
+  const rgb = [x, x, x].join(', ')
   return 'rgba(' + rgb + ', ' + scale + ')'
 }
 

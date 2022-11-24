@@ -1,27 +1,25 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import process from 'node:process'
+import fs from 'node:fs/promises'
 
-var frequencies = JSON.parse(
-  fs.readFileSync(
-    path.join(
-      process.cwd(),
-      'node_modules',
-      'subtlex-word-frequencies',
-      'index.json'
+const frequencies = JSON.parse(
+  String(
+    await fs.readFile(
+      new URL(
+        'node_modules/subtlex-word-frequencies/index.json',
+        import.meta.url
+      )
     )
   )
 )
 
-var data = frequencies
+const data = frequencies
   .concat()
   .sort(sort)
   .slice(0, 2 ** 16)
   .map((value) => value.word.toLowerCase())
 
-fs.writeFileSync(
-  path.join('src', 'words.js'),
-  'export var words = ' + JSON.stringify(data) + '\n'
+await fs.writeFile(
+  new URL('src/words.js', import.meta.url),
+  'export const words = ' + JSON.stringify(data) + '\n'
 )
 
 function sort(a, b) {

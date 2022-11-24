@@ -57,7 +57,6 @@
   "xo": {
     "prettier": true,
     "rules": {
-      "no-var": "off",
       "unicorn/prefer-dom-node-append": "off"
     }
   },
