@@ -1,5 +1,14 @@
+/**
+ * @typedef Frequency
+ * @property {string} word
+ * @property {number} count
+ */
+
 import fs from 'node:fs/promises'
 
+/**
+ * @type {Array<Frequency>}
+ */
 const frequencies = JSON.parse(
   String(
     await fs.readFile(
@@ -19,9 +28,23 @@ const data = frequencies
 
 await fs.writeFile(
   new URL('src/words.js', import.meta.url),
-  'export const words = ' + JSON.stringify(data) + '\n'
+  [
+    '/**',
+    ' * @typedef Frequency',
+    ' * @property {string} word',
+    ' * @property {number} count',
+    ' */',
+    '',
+    'export const words = ' + JSON.stringify(data),
+    ''
+  ].join('\n')
 )
 
+/**
+ * @param {Frequency} a
+ * @param {Frequency} b
+ * @returns {number}
+ */
 function sort(a, b) {
   return b.count - b.count
 }
