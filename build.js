@@ -1,7 +1,7 @@
 /**
  * @typedef Frequency
- * @property {string} word
  * @property {number} count
+ * @property {string} word
  */
 
 import fs from 'node:fs/promises'
@@ -31,8 +31,8 @@ await fs.writeFile(
   [
     '/**',
     ' * @typedef Frequency',
-    ' * @property {string} word',
     ' * @property {number} count',
+    ' * @property {string} word',
     ' */',
     '',
     'export const words = ' + JSON.stringify(data),

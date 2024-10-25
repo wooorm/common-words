@@ -1,7 +1,9 @@
-.DS_Store
-*.log
 *.d.ts
+*.log
+*.map
+*.tsbuildinfo
+.DS_Store
+dest/
 node_modules/
 src/words.js
-dest/
 yarn.lock

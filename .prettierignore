@@ -1,4 +1,4 @@
 dest/
+src/words.js
 *.html
-*.json
 *.md

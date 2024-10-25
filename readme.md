@@ -4,9 +4,9 @@
 
 ## Related
 
-*   [`write-music`](https://github.com/wooorm/write-music)
-*   [`short-words`](https://github.com/wooorm/short-words)
-*   [`readability`](https://github.com/wooorm/readability)
+* [`write-music`](https://github.com/wooorm/write-music)
+* [`short-words`](https://github.com/wooorm/short-words)
+* [`readability`](https://github.com/wooorm/readability)
 
 ## Data
 
